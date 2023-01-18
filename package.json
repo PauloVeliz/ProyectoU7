@@ -1,0 +1,31 @@
+{
+  "name": "proyectou7",
+  "version": "1.0.0",
+  "description": "Proyecto con NodeJs, Express, Prisma, Typescript, SQLite",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PauloVeliz/ProyectoU7.git"
+  },
+  "keywords": [
+    "NodeJs",
+    "Express",
+    "Prisma",
+    "Typescript",
+    "SQLite",
+    "Rest"
+  ],
+  "author": "Paulo Véliz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PauloVeliz/ProyectoU7/issues"
+  },
+  "homepage": "https://github.com/PauloVeliz/ProyectoU7#readme",
+  "devDependencies": {
+    "express": "^4.18.2",
+    "nodemon": "^2.0.20"
+  }
+}
