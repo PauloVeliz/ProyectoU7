@@ -9,3 +9,41 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id            Int       @id @default(autoincrement())
+  name          String
+  email         String    @unique
+  password      String
+  last_session  DateTime  @default(now())
+  update_at     DateTime  @updatedAt
+  date_born     DateTime
+  playlist      Playlist[]
+
+  @@map("users")
+}
+
+// Las canciones privadas sólo se pueden ver por los usuarios autenticados
+model Song {
+  id        Int     @id @default(autoincrement())
+  name      String  @unique
+  artist    String  @unique
+  album     String
+  year      Int
+  genre     String
+  duration  Int
+  access    Boolean  // Pública o Privada
+  playlist  Playlist[]  @relation("TablaIntermedia")
+
+  @@map("songs")
+}
+
+model Playlist {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  user_id   Int
+  user      User      @relation(fields: [user_id], references: [id])
+  songs     Song[]    @relation("TablaIntermedia")
+
+  @@map("playlists")
+}

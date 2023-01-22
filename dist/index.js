@@ -7,7 +7,7 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const routes_1 = require("./v1/routes");
 dotenv_1.default.config();
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 5000;
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 const baseRoute = '/api/v1';

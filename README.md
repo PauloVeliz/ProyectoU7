@@ -47,3 +47,15 @@ el servidor.
 22. Configurar variables en scripts dentro del archivo `package.json`
 
 23. Ejecutar servidor: `npm run dev`
+
+24. Crear schemas en el archivo `schema.prisma` dentro de prisma.
+
+25. Configurar el archivo `package.json` con la variable `migrate`
+
+26. En caso el servidor esté corriendo, detener y hacer las migraciones: `npm run migrate`
+
+27. Autenticación y hasheo: `npm install jsonwebtoken bcrypt -D`
+
+28. Crear y configurar rutas con prisma.
+
+29. Instalar `npm install @types/jsonwebtoken @types/bcrypt -D`
