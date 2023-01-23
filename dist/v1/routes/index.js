@@ -40,7 +40,7 @@ exports.v1Router.route('/users').post((req, res) => __awaiter(void 0, void 0, vo
         res.status(201).json(user);
     }
     catch (error) {
-        res.status(500).json({ OK: false, message: error });
+        return res.status(500).json({ OK: false, message: error });
     }
     ;
 }));
@@ -53,14 +53,11 @@ exports.v1Router.route('/users/login').post((req, res) => __awaiter(void 0, void
             }
         });
         if (!user) {
-            res.status(403).json({ error: 'This user doesnt exist!' });
+            return res.status(403).json({ error: 'This user doesnt exist!' });
         }
-        console.log('aquí');
         const valida_password = yield bcrypt_1.default.compare(body.password, user.password);
-        console.log('boom');
         if (!valida_password) {
-            console.log(valida_password);
-            res.status(403).json({ error: 'Invalid Password!' });
+            return res.status(403).json({ error: 'Invalid Password!' });
         }
         const user_updated = yield prisma.user.update({
             where: {
@@ -74,7 +71,7 @@ exports.v1Router.route('/users/login').post((req, res) => __awaiter(void 0, void
         res.status(201).json({ 'Token': token, 'last_session': user_updated.last_session });
     }
     catch (error) {
-        res.status(500).json({ OK: false, message: error });
+        return res.status(500).json({ OK: false, message: error });
     }
     ;
 }));
@@ -95,7 +92,58 @@ exports.v1Router.route('/songs').post((req, res) => __awaiter(void 0, void 0, vo
         res.status(201).json(song);
     }
     catch (error) {
-        res.status(500).json({ OK: false, message: error });
+        return res.status(500).json({ OK: false, message: error });
     }
     ;
+}));
+exports.v1Router.route('/songs').get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const token = ((_a = req.header('Authorization')) === null || _a === void 0 ? void 0 : _a.replace('Bearer ', '')) || "";
+        if (!token) {
+            return res.status(401).json({ error: 'No token!' });
+        }
+        const token_env = process.env.TOKEN_SECRET;
+        const user_loggedin = jsonwebtoken_1.default.verify(token, token_env);
+        const songs = yield prisma.song.findMany();
+        res.status(201).json({ message: 'User Authenticated', 'All songs': songs });
+    }
+    catch (error) {
+        const songs = yield prisma.song.findMany({
+            where: {
+                access: false
+            }
+        });
+        return res.status(201).json({ message: 'User Not Authenticated', 'Public songs': songs });
+    }
+}));
+exports.v1Router.route('/songs/:id').get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b;
+    try {
+        const token = ((_b = req.header('Authorization')) === null || _b === void 0 ? void 0 : _b.replace('Bearer ', '')) || "";
+        if (!token) {
+            return res.status(401).json({ error: 'No token!' });
+        }
+        const token_env = process.env.TOKEN_SECRET;
+        const user_loggedin = jsonwebtoken_1.default.verify(token, token_env);
+        const id_song = req.params.id;
+        const song = yield prisma.song.findUnique({
+            where: {
+                id: Number(id_song)
+            }
+        });
+        res.status(201).json({ message: 'User Authenticated', 'song': song });
+    }
+    catch (error) {
+        const id_song = req.params.id;
+        const song = yield prisma.song.findUnique({
+            where: {
+                id: Number(id_song)
+            }
+        });
+        if (song.access) {
+            return res.status(201).json({ message: 'User Not Authenticated - It is Not a Public song' });
+        }
+        return res.status(201).json({ message: 'User Not Authenticated', 'Public song': song });
+    }
 }));

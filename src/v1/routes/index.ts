@@ -3,6 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
+import { verify } from 'crypto';
+import { exit } from 'process';
 // import { access } from 'fs';
 
 export const v1Router = Router();
@@ -29,7 +31,7 @@ v1Router.route('/users').post( async(req:Request,res:Response)=>{
         res.status(201).json(user);
     }  
     catch (error) {
-        res.status(500).json({OK: false, message: error});
+        return res.status(500).json({OK: false, message: error});
     };
 });
 
@@ -43,14 +45,12 @@ v1Router.route('/users/login').post( async(req:Request,res:Response)=>{
         });
 
         if (!user) {
-            res.status(403).json({error:'This user doesnt exist!'});
+            return res.status(403).json({error:'This user doesnt exist!'});
         }
-        console.log('aquí');
+
         const valida_password = await bcrypt.compare(body.password,user.password);
-        console.log('boom');
         if (!valida_password){
-            console.log(valida_password);
-            res.status(403).json({error:'Invalid Password!'});
+            return res.status(403).json({error:'Invalid Password!'});
         }
 
         const user_updated = await prisma.user.update({
@@ -68,11 +68,11 @@ v1Router.route('/users/login').post( async(req:Request,res:Response)=>{
         res.status(201).json({'Token':token, 'last_session':user_updated.last_session});
     }  
     catch (error) {
-        res.status(500).json({OK: false, message: error});
+        return res.status(500).json({OK: false, message: error});
     };
 });
 
-v1Router.route('/songs').post( async(req:Request,res:Response)=>{
+v1Router.route('/songs').post(async(req:Request,res:Response)=>{
     try {
         const body = req.body;
         const song = await prisma.song.create({
@@ -89,6 +89,63 @@ v1Router.route('/songs').post( async(req:Request,res:Response)=>{
         res.status(201).json(song);
     }  
     catch (error) {
-        res.status(500).json({OK: false, message: error});
+        return res.status(500).json({OK: false, message: error});
     };
 });
+
+v1Router.route('/songs').get(async(req:Request,res:Response)=>{
+    try {
+        const token = req.header('Authorization')?.replace('Bearer ', '')||"";
+
+        if (!token){
+            return res.status(401).json({error:'No token!'})
+        }
+        const token_env = process.env.TOKEN_SECRET!;
+        const user_loggedin:any = jwt.verify(token,token_env);
+
+        const songs = await prisma.song.findMany();
+                
+        res.status(201).json({message: 'User Authenticated','All songs':songs});
+      }
+      catch (error) {
+        const songs = await prisma.song.findMany({
+            where:{
+                access:false
+            }
+        });
+        return res.status(201).json({message: 'User Not Authenticated', 'Public songs': songs});
+      }
+});
+
+v1Router.route('/songs/:id').get(async(req:Request,res:Response)=>{
+    try{
+        const token = req.header('Authorization')?.replace('Bearer ', '')||"";
+
+        if (!token){
+            return res.status(401).json({error:'No token!'})
+        }
+        const token_env = process.env.TOKEN_SECRET!;
+        const user_loggedin:any = jwt.verify(token,token_env);
+
+        const id_song = req.params.id;
+        const song: any = await prisma.song.findUnique({
+            where: {
+                id: Number(id_song)
+            }
+        });
+        res.status(201).json({message: 'User Authenticated','song':song});
+    }
+    catch (error) {
+        const id_song = req.params.id;
+        const song: any = await prisma.song.findUnique({
+            where: {
+                id: Number(id_song)
+            }
+        });
+        if (song.access){
+            return res.status(201).json({message: 'User Not Authenticated - It is Not a Public song'});
+        }
+        return res.status(201).json({message: 'User Not Authenticated','Public song':song});
+    }    
+});
+

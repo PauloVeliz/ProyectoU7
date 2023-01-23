@@ -5,7 +5,7 @@ import { v1Router } from './v1/routes';
 // const v1Router = require('./src/v1/routes'); //
 
 dotenv.config();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 4000;
 const app:Express = express();
 app.use(express.json());
 
