@@ -26,7 +26,7 @@ model User {
 // Las canciones privadas sólo se pueden ver por los usuarios autenticados
 model Song {
   id        Int     @id @default(autoincrement())
-  name      String  @unique
+  name      String
   artist    String
   album     String
   year      Int

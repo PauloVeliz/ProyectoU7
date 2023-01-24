@@ -1,61 +1,149 @@
 # Projecto Unidad 7
 
-1. Iniciar y configurar proyecto de acuerdo a los campos requeridos: `npm init`
+Proyecto creación API REST con NodeJs, Express, Prisma, Typescript, SQLite"
 
-2. Instalar Express localmente: `npm install express -D`
+## Configuración Local
 
-3. Instalar Nodemon localmente para que esté actualizado el servidor con cada
-cambio que se realice: `npm install nodemon -D`
+1. Elegir directorio de trabajo.
 
-4. Luego crear el archivo `index.js` con la configuración básica para levantar
-el servidor.
+2. Clonar repositorio en directorio de trabajo:
+```bash
+    git clone https://github.com/PauloVeliz/ProyectoU7
+```
 
-5. Levantar servidor: `npx nodemon index.js`
+3. Ingresar a `ProyectoU7`
 
-6. Instalar dotenv: `npm install dotenv -D`
+4. Instalar dependencias:
+```bash
+    npm install
+```
+5. Hacer migraciones:
+```bash
+    npm run migrate
+```
 
-7. Configurar index.js con dotenv.
+6. Ejecutar servidor:
+```bash
+    npm run dev
+```
 
-8. Instalar Prisma: `npm install prisma -D`
+## API REST
 
-9. Iniciar Prisma con DB SQLite: `npx prisma init --datasource-provider sqlite`
+### Crear usuario => (POST)
+```bash
+    /api/v1/users
+```
+#### Requerimiento Key-value
+```bash
+{
+  "name": "Usuario",
+  "email": "email@gmail.com",
+  "password": "123456"
+  "date_born": "2018-05-20"
+}
+```
+### Login del usuario => (POST)
+```bash
+    /api/v1/users/login
+```
 
-10. Añadir prisma-client: `npm install @prisma/client -D`
+#### Requerimiento Key-value
+```bash
+{
+  "email": "email@gmail.com",
+  "password": "123456"
+}
+```
 
-11. Instalar Typescript como Dependencia: `npm install typescript ts-node @types/express @types/node -D`
+### Listar usuarios => (GET)
+```bash
+    /api/v1/users
+```
 
-12. Generar archivo `tsconfig.json`: `npx tsc --init`
+### Listar un usuario => (GET)
+```bash
+    /api/v1/users/:id
+```
 
-13. Crear carpeta `src`, dentro crear la carpeta `v1`, y dentro crear la carpeta `routes`
+### Creación de canción => (POST)
+```bash
+    /api/v1/songs
+```
 
-14. Crear archivo `index.js` dentro de `/src/v1/routes` y configurar como ruta prueba.
+#### Requerimiento Key-value
+```bash
+{
+  "name": "Canción",
+  "artist": "Artista",
+  "album": "Album",
+  "year": 2023,
+  "genre": "Genero",
+  "duration": 180,
+  "access": true
+}
 
-15. Borrar ruta en el archivo `index.js` main y configurar para importar ruta desde `/src/v1/routes/index.js`.
+access:     true => Privada     false => Pública
+```
 
-16. Crear archivo `index.ts` dentro de carpeta `src` y copiar y pegar el código del archivo `index.ts` y modificar a typescript.
+### Listar canciones => (GET)
+```bash
+    /api/v1/songs
 
-17. Crear archivo `index.ts` dentro de carpeta routes y definir código y rutas.
+    Header Required: Authorization
+    Autenticar para listar todas las canciones (Incluye: privadas).
+```
 
-18. Configurar archivo `tsconfig.json`
+### Listar una canción => (GET)
+```bash
+    /api/v1/songs/:id
 
-19. Configurar archivo `package.json` y definir nuevo main el archivo `index.ts`
+    Header Required: Authorization
+    Autenticar para listar si la canción es privada.
+```
 
-20. Configurar archivo `.env`
+### Creación de playlist => (POST)
+```bash
+    /api/v1/playlist
+```
 
-21. Instalar concurrently: `npm install concurrently -D`
+#### Requerimiento Key-value
+```bash
+{
+  "name": "Playlist",
+  "user_id": 1,
+  "songs": [{
+        "name": "Canción",
+        "artist": "Artista",
+        "album": "Album",
+        "year": 2023,
+        "genre": "Género",
+        "duration": 180,
+        "access": false
+    }]
+}
 
-22. Configurar variables en scripts dentro del archivo `package.json`
+access:     true => Privada     false => Pública
+```
 
-23. Ejecutar servidor: `npm run dev`
+### Añadir una canción a un playlist => (POST)
+```bash
+    /api/v1/playlist/add-song
+```
 
-24. Crear schemas en el archivo `schema.prisma` dentro de prisma.
+#### Requerimiento Key-value
+```bash
+{
+  "id_song": 1,
+  "id_playlist": 1
+}
+```
 
-25. Configurar el archivo `package.json` con la variable `migrate`
+### Listar playlists => (GET)
+```bash
+    /api/v1/playlist
+```
 
-26. En caso el servidor esté corriendo, detener y hacer las migraciones: `npm run migrate`
-
-27. Autenticación y hasheo: `npm install jsonwebtoken bcrypt -D`
-
-28. Crear y configurar rutas con prisma.
-
-29. Instalar `npm install @types/jsonwebtoken @types/bcrypt -D`
+### Listar un playlist => (GET)
+```bash
+    /api/v1/playlist/:id
+```
